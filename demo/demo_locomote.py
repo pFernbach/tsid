@@ -56,8 +56,8 @@ w_LF = 1.0  # weight of left foot motion task
 kp_contact = 30.0               # proportional gain of contact constraint
 kp_com = 3000.0                   # proportional gain of center of mass task
 kp_posture = 30.0               # proportional gain of joint posture task
-kp_RF = 30.0                    # proportional gain of right foot motion task
-kp_LF = 30.0  # proportional gain of left foot motion task
+kp_RF = 3000.0                    # proportional gain of right foot motion task
+kp_LF = 3000.0  # proportional gain of left foot motion task
 REMOVE_CONTACT_N = 100  # remove right foot contact constraint after REMOVE_CONTACT_N time steps
 CONTACT_TRANSITION_TIME = 1.0  # duration of the contact transition (to smoothly get a zero contact force before removing a contact constraint)
 DELTA_COM_Y = 0.1  # distance between initial and desired center of mass position in y direction
@@ -168,7 +168,6 @@ leftFootTraj = tsid.TrajectorySE3Constant("traj-left-foot", H_lf_ref)
 
 com_ref = robot.com(data)
 trajCom = tsid.TrajectoryEuclidianConstant("traj_com", com_ref)
-print com_ref.T
 
 q_ref = q
 trajPosture = tsid.TrajectoryEuclidianConstant("traj_joint", q_ref)
@@ -282,7 +281,6 @@ for i in range(0, N_SIMULATION):
         com_init[0:3, 0] = robot.com(invdyn.data())
         com_traj = traj.SmoothedCOMTrajectory("com_smoothing", cs_result.contact_phases[state], com_init, 0.001)
         state_change = False
-        print "time", i*dt
 
     sampleCom = trajCom.computeNext()
     sampleCom.pos(com_traj(i * dt)[0].T)
@@ -323,13 +321,12 @@ for i in range(0, N_SIMULATION):
         if invdyn.checkContact(contactLF.name, sol):
             f = invdyn.getContactForce(contactLF.name, sol)
             print "\tnormal force %s: %.1f" % (contactLF.name.ljust(20, '.'), contactLF.getNormalForce(f))
-        '''
+        
         print "\ttracking err %s: %.3f" % (comTask.name.ljust(20, '.'), norm(comTask.position_error, 2))
         print "\ttracking err %s: %.3f" % (rightFootTask.name.ljust(20, '.'), norm(rightFootTask.position_error, 2))
         print "\ttracking err %s: %.3f" % (leftFootTask.name.ljust(20, '.'), norm(leftFootTask.position_error, 2))
         print "\t||v||: %.3f\t ||dv||: %.3f" % (norm(v, 2), norm(dv))
-        HQPData.print_all()
-        '''
+        
     v_mean = v + 0.5 * dt * dv
     v += dt * dv
     q = se3.integrate(robot.model(), q, dt * v_mean)

@@ -28,7 +28,13 @@ namespace tsid
       xyzQuat.head<3>() = M.translation();
       xyzQuat.tail<4>() = Eigen::Quaterniond(M.rotation()).coeffs();
     }
-
+    void XYZQUATToSE3(RefVector xyzQUAT, se3::SE3 & M)
+    {
+      assert(xyzQUAT.size()==7);
+      M.translation() = xyzQUAT.head<3>();
+      M.rotation() = Eigen::Quaterniond(xyzQUAT(6), xyzQUAT(3), xyzQUAT(4), xyzQUAT(5)).normalized().toRotationMatrix();  
+      //M.rotation() = Eigen::Quaterniond(xyzQUAT.tail<4>()).normalized().toRotationMatrix();
+    }
     void SE3ToVector(const se3::SE3 & M, RefVector vec)
     {
       assert(vec.size()==12);

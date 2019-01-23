@@ -23,6 +23,7 @@
 #include <pinocchio/algorithm/compute-all-terms.hpp>
 #include <pinocchio/algorithm/jacobian.hpp>
 #include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/centroidal.hpp>
 
 using namespace se3;
 using namespace tsid::math;
@@ -74,6 +75,7 @@ namespace tsid
       se3::centerOfMass<true,true,true>(m_model, data, false);
       se3::framesForwardKinematics(m_model, data);
       se3::centerOfMass(m_model, data, q, v, Eigen::VectorXd::Zero(nv()));
+      se3::ccrba(m_model, data, q, v);
     }
     
     const Vector & RobotWrapper::rotor_inertias() const
@@ -257,6 +259,10 @@ namespace tsid
                                           Data::Matrix6x & J) const
     {
       return se3::getFrameJacobian(m_model, data, index, J);
+    }
+    const Matrix6x & RobotWrapper::momentumJacobian(const Data & data) const
+    {
+      return data.Ag;
     }
     
     //    const Vector3 & com(Data & data,const Vector & q,
