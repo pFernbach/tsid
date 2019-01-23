@@ -82,7 +82,10 @@ namespace tsid
      * Convert the input SE3 object to a 7D vector of floats [X,Y,Z,Q1,Q2,Q3,Q4].
      */
     void SE3ToXYZQUAT(const se3::SE3 & M, RefVector xyzQuat);
-
+    /**
+     * Convert the input 7D vector of floats [X,Y,Z,Q1,Q2,Q3,Q4] to SE3 object.
+     */
+    void XYZQUATToSE3(RefVector xyzQUAT, se3::SE3 & M);
     /**
      * Convert the input SE3 object to a 12D vector of floats [X,Y,Z,R11,R12,R13,R14,...].
      */

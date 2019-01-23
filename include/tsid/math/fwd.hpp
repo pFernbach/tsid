@@ -42,6 +42,7 @@ namespace tsid
     typedef Eigen::Matrix<Scalar,3,1> Vector3;
     typedef Eigen::Matrix<Scalar,6,1> Vector6;
     typedef Eigen::Matrix<Scalar,3,Eigen::Dynamic> Matrix3x;
+    typedef Eigen::Matrix<Scalar,6,Eigen::Dynamic> Matrix6x;
     
     typedef Eigen::Ref<Vector3>             RefVector3;
     typedef const Eigen::Ref<const Vector3> ConstRefVector3;

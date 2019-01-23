@@ -27,6 +27,7 @@
 #include "tsid/bindings/python/solvers/HQPData.hpp"
 #include "tsid/contacts/contact-6d.hpp"
 #include "tsid/tasks/task-joint-posture.hpp"
+#include "tsid/tasks/task-posture.hpp"
 #include "tsid/tasks/task-se3-equality.hpp"
 #include "tsid/tasks/task-com-equality.hpp"
 namespace tsid
@@ -53,7 +54,7 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_SE3, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_COM, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Joint, bp::args("task", "weight", "priorityLevel", "transition duration"))
-        
+        .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Posture, bp::args("task", "weight", "priorityLevel", "transition duration"))
         
         .def("updateTaskWeight", &InvDynPythonVisitor::updateTaskWeight, bp::args("task_name", "weight"))
         .def("addRigidContact", &InvDynPythonVisitor::addRigidContact, bp::args("contact"))
@@ -81,6 +82,9 @@ namespace tsid
       static bool addMotionTask_Joint(T & self, tasks::TaskJointPosture & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }
+      static bool addMotionTask_Posture(T & self, tasks::TaskPosture & task, double weight, unsigned int priorityLevel, double transition_duration){
+        return self.addMotionTask(task, weight, priorityLevel, transition_duration);
+      }      
       static bool updateTaskWeight(T& self, const std::string & task_name, double weight){
         return self.updateTaskWeight(task_name, weight);
       }

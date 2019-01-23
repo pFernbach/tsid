@@ -171,5 +171,126 @@ for i in range(0, max_it):
     if i%100 == 0:
         print "Time :", t, "EE pos error :", error, "EE vel error :", np.linalg.norm(task_se3.velocity_error, 2)
 
+print ""
+print "Test Task Angular Momentum"
+print ""
+
+tol = 1e-5
+import os
+filename = str(os.path.dirname(os.path.abspath(__file__)))
+path = filename + '/../models/romeo'
+urdf = path + '/urdf/romeo.urdf'
+vector = se3.StdVec_StdString()
+vector.extend(item for item in path)
+robot = tsid.RobotWrapper(urdf, vector, se3.JointModelFreeFlyer(), False)
+model = robot.model()
+data = robot.data()
+
+q = robot.model().neutralConfiguration
+q[2] += 0.84
+print "q:", q.transpose()
+
+taskAM = tsid.TaskAMEquality("task-AM", robot)
+
+Kp = 100 * np.matrix(np.ones(3)).transpose()
+Kd = 20.0 * np.matrix(np.ones(3)).transpose()
+taskAM.setKp(Kp)
+taskAM.setKd(Kd)
+
+assert np.linalg.norm(Kp - taskAM.Kp ,2) < tol
+assert np.linalg.norm(Kd - taskAM.Kd ,2) < tol
+
+am_ref  =np.matrix(np.zeros(3)).transpose()
+traj = tsid.TrajectoryEuclidianConstant("traj_se3", am_ref)
+sample = tsid.TrajectorySample(0)
+
+t = 0.0
+dt = 0.001
+max_it = 1000
+Jpinv = np.matrix(np.zeros((robot.nv, 3)))
+error_past = 1e100
+v = np.matrix(np.random.randn(robot.nv)).transpose()
+
+for i in range(0, max_it):
+    robot.computeAllTerms(data, q, v)
+    sample = traj.computeNext()
+    taskAM.setReference(sample)
+    const = taskAM.compute(t, q, v, data)
+
+    Jpinv = np.linalg.pinv(const.matrix, 1e-5)
+    dv = Jpinv * const.vector
+
+    assert np.linalg.norm(Jpinv*const.matrix, 2) - 1.0 < tol
+    v += dt*dv
+    q = se3.integrate(model, q, dt * v)
+    t += dt
+
+    error = np.linalg.norm(taskAM.momentum_error, 2)
+    assert error - error_past < 1e-4
+    error_past = error
+    if error < 1e-8:
+        print "Success Convergence"
+        break
+    if i%100 == 0:
+        print "Time :", t, "Momentum error :", error
+
+print ""
+print "Test Task Posture"
+print ""
+
+q = robot.model().neutralConfiguration
+q[2] += 0.84
+
+task_posture = tsid.TaskPosture("task-posture", robot)
+
+nv = robot.nv
+Kp = 100 * np.matrix(np.ones(nv)).transpose()
+Kd = 20.0 * np.matrix(np.ones(nv)).transpose()
+task_posture.setKp(Kp)
+task_posture.setKd(Kd)
+masks = np.matrix(np.zeros(nv)).T
+masks[3] = 1
+masks[4] = 1
+masks[5] = 1
+task_posture.mask(masks)
+
+assert np.linalg.norm(Kp - task_posture.Kp ,2) < tol
+assert np.linalg.norm(Kd - task_posture.Kd ,2) < tol
+
+q_ref = np.matrix(np.random.randn(nv+1)).transpose()
+q_ref[0:3] = np.matrix([0, 0, 0.84]).T
+q_ref[3:7] = np.matrix([0.0871, 0, 0, 0.9962]).T
+
+traj = tsid.TrajectoryEuclidianConstant("traj_joint", q_ref)
+sample = tsid.TrajectorySample(0)
+
+error_past = 1e100
+t = 0.0
+max_it = 1000
+
+for i in range(0, max_it):
+    robot.computeAllTerms(data, q, v)
+    sample = traj.computeNext()
+    task_posture.setReference(sample)
+    const = task_posture.compute(t, q, v, data)
+
+    Jpinv = np.linalg.pinv(const.matrix, 1e-5)
+    dv = Jpinv * const.vector
+
+    assert np.linalg.norm(Jpinv*const.matrix, 2) - 1.0 < tol
+    v += dt*dv
+    q = se3.integrate(model, q, dt * v)
+    t += dt
+
+    error = np.linalg.norm(task_posture.position_error, 2)
+    assert error - error_past < 1e-4
+    error_past = error
+    if error < 1e-8:
+        print "Success Convergence"
+        break
+    if i%100 == 0:
+        print "Time :", t, "Joint pos error :", error, "Joint vel error :", np.linalg.norm(task_posture.velocity_error, 2)
+print "All test is done"
+
 print "All test is done"
 

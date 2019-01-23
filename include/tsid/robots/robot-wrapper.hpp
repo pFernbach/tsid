@@ -51,6 +51,7 @@ namespace tsid
       typedef math::Vector6 Vector6;
       typedef math::Matrix Matrix;
       typedef math::Matrix3x Matrix3x;
+      typedef math::Matrix6x Matrix6x;
       typedef math::RefVector RefVector;
       typedef math::ConstRefVector ConstRefVector;
       
@@ -152,7 +153,7 @@ namespace tsid
       void frameJacobianLocal(const Data & data,
                               const Model::FrameIndex index,
                               Data::Matrix6x & J) const;
-      
+      const Matrix6x & momentumJacobian(const Data & data) const;
       
     protected:
       
