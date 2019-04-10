@@ -30,6 +30,7 @@
 #include "tsid/tasks/task-posture.hpp"
 #include "tsid/tasks/task-se3-equality.hpp"
 #include "tsid/tasks/task-com-equality.hpp"
+#include "tsid/tasks/task-angular-momentum-equality.hpp"
 namespace tsid
 {
   namespace python
@@ -55,7 +56,8 @@ namespace tsid
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_COM, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Joint, bp::args("task", "weight", "priorityLevel", "transition duration"))
         .def("addMotionTask", &InvDynPythonVisitor::addMotionTask_Posture, bp::args("task", "weight", "priorityLevel", "transition duration"))
-        
+        .def("addTask", &InvDynPythonVisitor::addTask_AM, bp::args("task", "weight", "priorityLevel"))
+
         .def("updateTaskWeight", &InvDynPythonVisitor::updateTaskWeight, bp::args("task_name", "weight"))
         .def("addRigidContact", &InvDynPythonVisitor::addRigidContact, bp::args("contact"))
         .def("removeTask", &InvDynPythonVisitor::removeTask, bp::args("task_name", "duration"))
@@ -85,6 +87,11 @@ namespace tsid
       static bool addMotionTask_Posture(T & self, tasks::TaskPosture & task, double weight, unsigned int priorityLevel, double transition_duration){
         return self.addMotionTask(task, weight, priorityLevel, transition_duration);
       }      
+      static bool addTask_AM(T & self, tasks::TaskAMEquality & task, double weight, unsigned int priorityLevel){
+        TaskLevel *tl = new TaskLevel(task, priorityLevel);
+        self.addTask(tl, weight, priorityLevel);
+        return true;
+      }
       static bool updateTaskWeight(T& self, const std::string & task_name, double weight){
         return self.updateTaskWeight(task_name, weight);
       }
