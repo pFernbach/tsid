@@ -127,12 +127,12 @@ bool InverseDynamicsFormulationAccForce::addMotionTask(TaskMotion & task,
   assert(transition_duration>=0.0);
   
   // This part is not used frequently so we can do some tests.
-  if (weight>=0.0)
+  if (weight<0.0)
     std::cerr << __FILE__ <<  " " << __LINE__ << " "
       << "weight should be positive" << std::endl;
 
   // This part is not used frequently so we can do some tests.
-  if (transition_duration>=0.0)
+  if (transition_duration<0.0)
     std::cerr << "transition_duration should be positive" << std::endl;
 
   TaskLevel *tl = new TaskLevel(task, priorityLevel);
