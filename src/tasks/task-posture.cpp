@@ -90,7 +90,7 @@ namespace tsid
     {
       assert(ref.pos.size()==m_robot.nq());
       assert(ref.vel.size()==m_robot.nv());
-      assert(ref.acc.size()==m_robot.na());
+      assert(ref.acc.size()==m_robot.nv());
       m_ref = ref;
     }
 
