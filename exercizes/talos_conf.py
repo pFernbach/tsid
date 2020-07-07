@@ -22,7 +22,7 @@ lf_frame_name = "leg_left_sole_fix_joint"   # left foot frame name
 contactNormal = np.array([0., 0., 1.])      # direction of the normal to the contact surface
 
 w_com = 1.0             # weight of center of mass task
-w_foot = 1e-1           # weight of the foot motion task
+w_foot = 1.0            # weight of the foot motion task
 w_contact = -1.0        # weight of foot in contact (negative means infinite weight)
 w_posture = 1e-1        # weight of joint posture task
 w_forceRef = 1e-5       # weight of force regularization task
