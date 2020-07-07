@@ -102,14 +102,27 @@ class TsidBiped:
         jointBoundsTask.setVelocityBounds(self.v_min, self.v_max)
         if conf.w_joint_bounds > 0.0:
             formulation.addMotionTask(jointBoundsTask, conf.w_joint_bounds, 0, 0.0)
+        
+        orientationRootTask = tsid.TaskSE3Equality("task-orientation-root", robot, 'root_joint')
+        mask = np.ones(6)
+        mask[0:3] = 0
+        orientationRootTask.setMask(mask)
+        orientationRootTask.setKp(conf.kp_rootOrientation * mask)
+        orientationRootTask.setKd(2.0 * np.sqrt(conf.kp_rootOrientation * mask))
+
+        formulation.addMotionTask(orientationRootTask, conf.w_rootOrientation, 1, 0.0)
 
         com_ref = robot.com(data)
         self.trajCom = tsid.TrajectoryEuclidianConstant("traj_com", com_ref)
         self.sample_com = self.trajCom.computeNext()
 
         q_ref = q[7:]
+        
         self.trajPosture = tsid.TrajectoryEuclidianConstant("traj_joint", q_ref)
         postureTask.setReference(self.trajPosture.computeNext())
+        self.trajOrientationRoot = tsid.TrajectorySE3Constant("traj-orientation-root", pin.SE3.Identity())
+        orientationRootTask.setReference(self.trajOrientationRoot.computeNext())
+
 
         self.sampleLF = self.trajLF.computeNext()
         self.sample_LF_pos = self.sampleLF.pos()
@@ -130,6 +143,7 @@ class TsidBiped:
         self.contactLF = contactLF
         self.actuationBoundsTask = actuationBoundsTask
         self.jointBoundsTask = jointBoundsTask
+        self.orientationRootTask = orientationRootTask
         self.formulation = formulation
         self.q = q
         self.v = v

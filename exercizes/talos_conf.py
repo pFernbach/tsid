@@ -28,6 +28,7 @@ w_posture = 1e-1        # weight of joint posture task
 w_forceRef = 1e-5       # weight of force regularization task
 w_torque_bounds = 1.0   # weight of the torque bounds
 w_joint_bounds = 0.0
+w_rootOrientation = 1.0 # weight of the root's orientation task
 
 gain_vector = np.array(  # gain vector for postural task
     [
@@ -74,7 +75,7 @@ kp_contact = 10.0       # proportional gain of contact constraint
 kp_foot = 10.0          # proportional gain of contact constraint
 kp_com = 10.0           # proportional gain of center of mass task
 kp_posture = 1.0        # proportional gain of joint posture task
-
+kp_rootOrientation = 1e2  # proportional gain of the root's orientation task
 PRINT_N = 500           # print every PRINT_N time steps
 DISPLAY_N = 20          # update robot configuration in viwewer every DISPLAY_N time steps
 CAMERA_TRANSFORM = [4.0, -0.2, 0.4, 0.5243823528289795, 0.518651008605957, 0.4620114266872406, 0.4925136864185333]
